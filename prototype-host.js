@@ -5,6 +5,7 @@ var cpUpload = multer({ dest: __dirname + '/uploads/' }).fields([{ name: 'file',
 const mkdirp = require("mkdirp");
 var extract = require('extract-zip');
 var Servings = require("./servings.js").Servings;
+const rimraf = require("rimraf");
 
 const PrototypeHost = {
     startHost(port) {
@@ -12,19 +13,21 @@ const PrototypeHost = {
 
         let servings = Servings.createServings();
 
-        app.post("/deploy", cpUpload, (req, res) => {
-            let targetPort = req.query.port;
+        app.post("/deploy/:port", cpUpload, (req, res) => {
+            let targetPort = req.params.port;
 
             let uploadedFile = req.files["file"][0];
 
             let uploadedPath = uploadedFile.path;
 
-            mkdirp(__dirname + "/prototypes/" + targetPort, () => {
+            let deployDir = `${__dirname}/prototypes/${targetPort}`;
+            rimraf(deployDir, () => {
+                mkdirp(deployDir, () => {
+                    extract(uploadedPath, {dir: deployDir}, function (err) {
+                        fs.unlink(uploadedPath);
 
-                extract(uploadedPath, {dir: __dirname + "/prototypes/" + targetPort}, function (err) {
-                    fs.unlink(uploadedPath);
-
-                    servings.restart(targetPort);
+                        servings.restart(targetPort);
+                    });
                 });
             });
             res.json({});

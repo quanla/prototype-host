@@ -7,9 +7,12 @@ const Servings = {
 
         let servings = {};
 
-        fs.readdir(`${__dirname}/prototypes`, (err, list) => {
-            list.forEach((port) => startServer(port));
-        });
+        let prototypesDir = `${__dirname}/prototypes`;
+        if (fs.existsSync(prototypesDir)) {
+            fs.readdir(prototypesDir, (err, list) => {
+                list.forEach((port) => startServer(port));
+            });
+        }
 
         function startServer(port) {
 
