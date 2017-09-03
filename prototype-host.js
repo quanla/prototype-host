@@ -34,7 +34,7 @@ const PrototypeHost = {
         });
 
         app.listen(port, () => {
-            console.log(`Hosting prototypes at ${port}`);
+            console.log(`[${new Date()}] Hosting prototypes at ${port}`);
         });
     }
 };
